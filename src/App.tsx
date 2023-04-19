@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Header from './components/header/Header';
@@ -7,15 +7,27 @@ import Podcast from './screens/podcast/Podcast';
 import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import Episode from './screens/episode/Episode';
 
+export const LoadingContext = createContext(
+  {
+    loading: false,
+    setLoading: (loading: boolean) => {}
+  }
+)
+
 function App() {
+
+  const [loading, setLoading] = useState(false);
+  
   return (
     <Router>
-      <Header />
-      <Routes>
-        <Route path="/"  Component={Main} />
-        <Route path="/podcast/:podcastId"  Component={Podcast} />
-        <Route path="/podcast/:podcastId/episode/:episodeId"  Component={Episode} />
-      </Routes>
+      <LoadingContext.Provider value={{loading, setLoading}}>
+        <Header />
+        <Routes>
+          <Route path="/"  Component={Main} />
+          <Route path="/podcast/:podcastId"  Component={Podcast} />
+          <Route path="/podcast/:podcastId/episode/:episodeId"  Component={Episode} />
+        </Routes>
+      </LoadingContext.Provider>
     </Router>
   );
 }

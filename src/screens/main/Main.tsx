@@ -4,11 +4,14 @@ import Form from 'react-bootstrap/Form';
 import InfoCard from '../../components/info-card/InfoCard';
 import Badge from 'react-bootstrap/Badge';
 import './Main.css';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { getPodcasts, storageRequest } from '../../services/podcast.service';
 import { PodcastInfo } from '../../models/Podcast.model';
+import { LoadingContext } from '../../App';
 
 function Main() {
+    const loadingContext = useContext(LoadingContext);
+
     const emptyList: Array<PodcastInfo> = []
     const [podcastsList, setPodcastsList] = useState(emptyList);
     const [podcastsListForSearch, setPodcastsListForSearch] = useState(emptyList);
@@ -26,6 +29,7 @@ function Main() {
     }
 
     useEffect(() => {
+        loadingContext.setLoading(true);
         getPodcasts().then(
             (response:any) => {
                 const podcastsList: any = [];
@@ -42,8 +46,11 @@ function Main() {
                 setPodcastsListForSearch(podcastsList);
                 setTotalPodcasts(podcastsList.length);
                 storageRequest('podcastsList', response);
+                loadingContext.setLoading(false);
             }
-        )
+        ).catch(() => {
+            loadingContext.setLoading(false);
+        });
     }, [])
   return (
     <Container className="mt-5">
@@ -63,7 +70,8 @@ function Main() {
                         id={podcast.id}
                         image={podcast.image}
                         name={podcast.name}
-                        author={podcast.author}/>
+                        author={podcast.author}
+                        key={podcast.id}/>
                 )
             })
         }

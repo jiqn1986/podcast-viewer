@@ -5,12 +5,13 @@ import { Col, ListGroup, Table } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import { Link, useParams } from 'react-router-dom';
 import { getPodcastDetails } from '../../services/podcast.service';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { PodcastInfo } from '../../models/Podcast.model';
 import { formatDate, msToTime } from '../../helpers/timeHelper';
 import { EpisodeInfo } from '../../models/Episode.model';
 import { Response, ResponseContent } from '../../models/Response.model';
 import PodcastCard from '../../components/podcast-card/PodcastCard';
+import { LoadingContext } from '../../App';
 
 function Episode() {
 
@@ -28,11 +29,13 @@ function Episode() {
         image: ''
     }
 
+    const loadingContext = useContext(LoadingContext);
     const [podcastInfo, setPodcastInfo] = useState(emptyInfo);
     const [podcastEpisode, setPodcastEpisode] = useState(episode);
     const params = useParams();
 
     useEffect(() => {
+        loadingContext.setLoading(true);
         if (params.podcastId && params.episodeId) {
             const podcastId = parseInt(params.podcastId);
             const episodeId = parseInt(params.episodeId);
@@ -65,43 +68,53 @@ function Episode() {
                             };
                             setPodcastInfo(info);
                         }
-                    });                    
+                    });
+                    loadingContext.setLoading(false);                  
                 }
-            );
+            ).catch(() => {
+                loadingContext.setLoading(false);
+            });
         }
     }, [params.podcastId, params.episodeId])
 
   return (
     <Container className="mt-5">
-        <Row>
-            <Col lg={3} md={3} sm={2} xs={12}>
-                <PodcastCard
-                    id={podcastInfo.id}
-                    image={podcastInfo.image}
-                    name={podcastInfo.name}
-                    author={podcastInfo.author}
-                    description={podcastInfo.description} />
-            </Col>
-            <Col lg={9} md={9} sm={10} xs={12}>
-                <Card className="w-100 shadow text-start p-2">
-                    <Card.Title className="strong">
-                        <h3 className="strong ps-3">{podcastEpisode.name}</h3>
-                    </Card.Title>
-                    <Card.Text>
-                        {podcastEpisode.description}
-                    </Card.Text>
-                    {podcastEpisode.url !== '' && (
-                        <div>
-                            <audio controls preload="auto" className='w-100'>
-                                <source src={podcastEpisode.url} type="audio/mpeg" />
-                                <source src={podcastEpisode.url} type='audio/ogg; codecs="vorbis"'></source>
-                                Your browser does not support the audio element.
-                            </audio>
-                        </div>
-                    )}
-                </Card>
-            </Col>
-        </Row>
+        {!loadingContext.loading && (
+            <Row>
+                <Col lg={3} md={3} sm={2} xs={12}>
+                    <PodcastCard
+                        id={podcastInfo.id}
+                        image={podcastInfo.image}
+                        name={podcastInfo.name}
+                        author={podcastInfo.author}
+                        description={podcastInfo.description} />
+                </Col>
+                <Col lg={9} md={9} sm={10} xs={12}>
+                    <Card className="w-100 shadow text-start p-2">
+                        <Card.Title className="strong">
+                            <h3 className="strong ps-3">{podcastEpisode.name}</h3>
+                        </Card.Title>
+                        <Card.Text>
+                        <div
+                            dangerouslySetInnerHTML={{__html: podcastEpisode.description || ''}}
+                            />
+                        </Card.Text>
+                        {podcastEpisode.url !== '' && (
+                            <span>
+                                <audio controls preload="auto" className='w-100'>
+                                    <source src={podcastEpisode.url} type="audio/mpeg" />
+                                    <source src={podcastEpisode.url} type='audio/ogg; codecs="vorbis"'></source>
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </span>
+                        )}
+                    </Card>
+                </Col>
+            </Row>
+         )}
+         {loadingContext.loading && (
+             <h5 className="text-center">Please wait ...</h5>
+         )}
     </Container>
   );
 }
