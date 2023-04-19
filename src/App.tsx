@@ -1,10 +1,9 @@
-import React, { createContext, useState } from 'react';
-import logo from './logo.svg';
+import { createContext, useState } from 'react';
 import './App.css';
 import Header from './components/header/Header';
 import Main from './screens/main/Main';
 import Podcast from './screens/podcast/Podcast';
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Episode from './screens/episode/Episode';
 
 export const LoadingContext = createContext(

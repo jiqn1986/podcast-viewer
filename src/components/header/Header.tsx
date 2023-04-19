@@ -4,7 +4,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import './Header.css';
 import { Link } from 'react-router-dom';
 import { LoadingContext } from '../../App';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 function Header() {
   const loading = useContext(LoadingContext).loading;

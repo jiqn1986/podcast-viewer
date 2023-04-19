@@ -1,7 +1,7 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import './Podcast.css';
-import { Col, ListGroup, Table } from 'react-bootstrap';
+import { Col, Table } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import { Link, useParams } from 'react-router-dom';
 import { getPodcastDetails, storageRequest } from '../../services/podcast.service';

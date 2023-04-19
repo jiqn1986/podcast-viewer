@@ -1,13 +1,11 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-//import './Podcast.css';
-import { Col, ListGroup, Table } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getPodcastDetails } from '../../services/podcast.service';
 import { useContext, useEffect, useState } from 'react';
 import { PodcastInfo } from '../../models/Podcast.model';
-import { formatDate, msToTime } from '../../helpers/timeHelper';
 import { EpisodeInfo } from '../../models/Episode.model';
 import { Response, ResponseContent } from '../../models/Response.model';
 import PodcastCard from '../../components/podcast-card/PodcastCard';
