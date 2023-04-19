@@ -5,18 +5,32 @@ import InfoCard from '../../components/info-card/InfoCard';
 import Badge from 'react-bootstrap/Badge';
 import './Main.css';
 import { useEffect, useState } from 'react';
-import { getPodcasts } from '../../services/podcast.service';
+import { getPodcasts, storageRequest } from '../../services/podcast.service';
 import { PodcastInfo } from '../../models/Podcast.model';
 
 function Main() {
-    const [podcastsList, setPodcastsList] = useState([]);
+    const emptyList: Array<PodcastInfo> = []
+    const [podcastsList, setPodcastsList] = useState(emptyList);
+    const [podcastsListForSearch, setPodcastsListForSearch] = useState(emptyList);
+    const [totalPodcasts, setTotalPodcasts] = useState(0);
+
+    const handleFilter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        const input = event.target as HTMLInputElement;
+        const filteredPodcast = podcastsListForSearch.filter(podcast => {
+            console.log(podcast.name.includes(input.value), podcast.name)
+            return podcast.name.toLocaleLowerCase().includes(input.value.toLocaleLowerCase())
+                || podcast.author.toLocaleLowerCase().includes(input.value.toLocaleLowerCase())
+        });
+        setPodcastsList(filteredPodcast);
+        setTotalPodcasts(filteredPodcast.length);
+    }
 
     useEffect(() => {
         getPodcasts().then(
             (response:any) => {
                 const podcastsList: any = [];
                 response.data.feed.entry.map( (entry: any) => {
-                    const podcast = {
+                    const podcast: PodcastInfo = {
                         id: entry.id.attributes['im:id'],
                         image: entry['im:image'][2].label,
                         name: entry['im:name'].label,
@@ -25,6 +39,9 @@ function Main() {
                     podcastsList.push(podcast);
                 })
                 setPodcastsList(podcastsList);
+                setPodcastsListForSearch(podcastsList);
+                setTotalPodcasts(podcastsList.length);
+                storageRequest('podcastsList', response);
             }
         )
     }, [])
@@ -32,10 +49,10 @@ function Main() {
     <Container className="mt-5">
         <Form className="row justify-content-end">
             <div className="mb-3 col-auto">
-                <Badge bg="primary" className="col-form-label p-1 mt-1 badge-text">100</Badge>
+                <Badge bg="primary" className="col-form-label p-1 mt-1 badge-text">{totalPodcasts}</Badge>
             </div>
             <div className="col-auto">
-                <Form.Control type="text" className="" placeholder="Filter podcasts..." />
+                <input type="text" className="form-control" placeholder="Filter podcasts..." onKeyUp={handleFilter}/>
             </div>
         </Form>
       <Row>
