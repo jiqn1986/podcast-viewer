@@ -57,6 +57,7 @@ function Episode() {
                             episode.date = result.releaseDate;
                             episode.url = result.episodeUrl;
                             episode.duration = result.trackTimeMillis;
+                            episode.description = episode.description?.replace(/\n/g, "<br />")
                             setPodcastEpisode(episode);
                         } else if (result.kind === 'podcast') {
                             const info: PodcastInfo = {
@@ -71,7 +72,8 @@ function Episode() {
                     });
                     loadingContext.setLoading(false);                  
                 }
-            ).catch(() => {
+            ).catch((e: Error) => {
+                console.error(e);
                 loadingContext.setLoading(false);
             });
         }

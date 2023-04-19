@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// TOD: To move to env file for privacy
+const API_URL = 'https://itunes.apple.com';
+const BYPASS_URL = 'https://api.allorigins.win/get?url=';
+export const PODCAST_STORAGE_NAME = 'podcastsList';
+
 export const getPodcasts = (): Promise<any> => {
-  const storageObject = checkRequest('podcastsList');
+  const storageObject = checkRequest(PODCAST_STORAGE_NAME);
 
   if (storageObject) {
     return new Promise((resolve) => {
@@ -10,19 +15,27 @@ export const getPodcasts = (): Promise<any> => {
   }
     const options = {
 		method: 'GET',
-		url: 'https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json',
+		url: `${API_URL}/us/rss/toppodcasts/limit=100/genre=1310/json`,
     };
     return axios.request(options);
 }
 
 export const getPodcastDetails = (id: string): Promise<any> => {
-    const apiUrl = `https://itunes.apple.com/lookup?id=${id}&country=US&media=podcast&entity=podcastEpisode`
-    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`
-    const options = {
-      method: 'GET',
-      url: url,
-    };
-    return axios.request(options);
+  const storageObject = checkRequest(id);
+
+  if (storageObject) {
+    return new Promise((resolve) => {
+      resolve(storageObject);
+    });
+  }
+
+  const apiUrl = `${API_URL}/lookup?id=${id}&country=US&media=podcast&entity=podcastEpisode`
+  const url = `${BYPASS_URL}${encodeURIComponent(apiUrl)}`
+  const options = {
+    method: 'GET',
+    url: url,
+  };
+  return axios.request(options);
 }
 
 const checkRequest = (name: string): any => {

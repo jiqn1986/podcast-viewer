@@ -4,7 +4,7 @@ import './Podcast.css';
 import { Col, ListGroup, Table } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import { Link, useParams } from 'react-router-dom';
-import { getPodcastDetails } from '../../services/podcast.service';
+import { getPodcastDetails, storageRequest } from '../../services/podcast.service';
 import { useContext, useEffect, useState } from 'react';
 import { PodcastInfo } from '../../models/Podcast.model';
 import { formatDate, msToTime } from '../../helpers/timeHelper';
@@ -36,7 +36,6 @@ function Podcast() {
     
             podcastDetails.then(
                 (podcast: any) => {
-                    console.log(loadingContext.loading)
                     const podcastResult: Response = JSON.parse(podcast.data.contents);
                     podcastResult.results.forEach((result: ResponseContent) => {
                         if (result.kind === 'podcast-episode') {
@@ -57,15 +56,16 @@ function Podcast() {
                                 image: result.artworkUrl600,
                                 description: result.description || ''
                             };
-                            console.log(info)
                             setPodcastInfo(info);
                         }
                     });
                     setPodcastEpisodes(episodes);
+                    storageRequest(podcastId.toString(), podcast);
                     episodes = [];
                     loadingContext.setLoading(false);
                 }
-            ).catch(() => {
+            ).catch((e: Error) => {
+                console.error(e);
                 loadingContext.setLoading(false);
             })
         }

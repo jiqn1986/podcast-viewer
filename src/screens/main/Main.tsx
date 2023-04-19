@@ -5,7 +5,7 @@ import InfoCard from '../../components/info-card/InfoCard';
 import Badge from 'react-bootstrap/Badge';
 import './Main.css';
 import { useContext, useEffect, useState } from 'react';
-import { getPodcasts, storageRequest } from '../../services/podcast.service';
+import { PODCAST_STORAGE_NAME, getPodcasts, storageRequest } from '../../services/podcast.service';
 import { PodcastInfo } from '../../models/Podcast.model';
 import { LoadingContext } from '../../App';
 
@@ -45,10 +45,11 @@ function Main() {
                 setPodcastsList(podcastsList);
                 setPodcastsListForSearch(podcastsList);
                 setTotalPodcasts(podcastsList.length);
-                storageRequest('podcastsList', response);
+                storageRequest(PODCAST_STORAGE_NAME, response);
                 loadingContext.setLoading(false);
             }
-        ).catch(() => {
+        ).catch((e: Error) => {
+            console.error(e);
             loadingContext.setLoading(false);
         });
     }, [])
